@@ -16,10 +16,11 @@ describe("gl disclose", () => {
 
     const parsed = JSON.parse(h.out[0] as string);
     expect(parsed.document).toEqual({ subject: "gl", version: 1 });
-    expect(typeof parsed.agentId).toBe("string");
-    expect(parsed.agentId.length).toBe(64);
-    expect(typeof parsed.signature).toBe("string");
-    expect(parsed.signature.length).toBeGreaterThan(0);
+    expect(parsed.signature.algorithm).toBe("ed25519");
+    expect(typeof parsed.signature.publicKey).toBe("string");
+    expect(parsed.signature.publicKey.length).toBe(64);
+    expect(typeof parsed.signature.value).toBe("string");
+    expect(parsed.signature.value.length).toBeGreaterThan(0);
   });
 
   test("refuses with no signer key", async () => {

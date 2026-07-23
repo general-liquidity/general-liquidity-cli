@@ -3,9 +3,8 @@ import { run } from "../index.ts";
 import { makeHarness } from "../internal/testkit.ts";
 
 const DISCLOSURE = JSON.stringify({
-  agentId: "pubkeyhex",
   document: { name: "acme" },
-  signature: "sig",
+  signature: { algorithm: "ed25519", publicKey: "pubkeyhex", value: "sig" },
 });
 
 describe("gl verify", () => {
@@ -24,7 +23,7 @@ describe("gl verify", () => {
 
     const req = h.requests[0];
     expect(req?.url).toBe("https://gl.test/verify");
-    expect(req?.body).toMatchObject({ agent_id: "pubkeyhex" });
+    expect(req?.body).toMatchObject({ signature: { public_key: "pubkeyhex" } });
 
     const parsed = JSON.parse(h.out[0] as string);
     expect(parsed).toEqual({ outcome: "allow", reasons: ["ok"], mandateId: "m1" });
