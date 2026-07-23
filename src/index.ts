@@ -1,8 +1,12 @@
 #!/usr/bin/env bun
+import { approveCmd } from "./commands/approve.ts";
 import { auditCmd } from "./commands/audit.ts";
 import { configCmd } from "./commands/config.ts";
 import { discloseCmd } from "./commands/disclose.ts";
+import { killSwitchCmd } from "./commands/killSwitch.ts";
 import { payCmd } from "./commands/pay.ts";
+import { refundCmd } from "./commands/refund.ts";
+import { resetBreakerCmd } from "./commands/resetBreaker.ts";
 import { resolveCmd } from "./commands/resolve.ts";
 import { testnetPayCmd } from "./commands/testnetPay.ts";
 import { verifyCmd } from "./commands/verify.ts";
@@ -20,6 +24,10 @@ const COMMANDS: Record<string, Handler> = {
   audit: auditCmd,
   "testnet-pay": testnetPayCmd,
   config: configCmd,
+  approve: approveCmd,
+  refund: refundCmd,
+  "kill-switch": killSwitchCmd,
+  "reset-breaker": resetBreakerCmd,
 };
 
 const HELP = `gl - operator CLI for General Liquidity
@@ -35,15 +43,23 @@ Commands:
   testnet-pay                   Governed live Base Sepolia settlement (env-driven)
   config <show|path|get|set>    Inspect or edit the non-secret CLI config
 
+Operator (separate authority: a detached GL-Operator ed25519 signature, not the API key):
+  approve                       Release a parked intent (--intent-id --challenge --mandate --rationale [--ack])
+  refund                        Reverse a settled payment (--intent-id --rationale [--amount-minor <n>])
+  kill-switch <engage|disengage>  Freeze or release the settle path (--rationale)
+  reset-breaker                 Clear a tripped circuit breaker (--rationale)
+
 Global:
   --pretty                      Indent JSON output
 
 Environment:
   GL_BASE_URL                   Base URL of the running GL server
   GL_API_KEY                    Server API key (env var name is configurable)
-  GL_SIGNER_PRIVATE_KEY         Operator ed25519 signing seed, hex (name is configurable)
+  GL_SIGNER_PRIVATE_KEY         Agent ed25519 signing seed, hex (name is configurable)
+  GL_OPERATOR_KEY               Operator ed25519 seed, hex (or pass --key <path>)
+  GL_OPERATOR_KEY_ID            Operator key id the server registered (or pass --key-id <id>)
 
-Keys are read from the environment only; never hardcoded, never committed.`;
+Keys are read from the environment or a --key file only; never hardcoded, never logged.`;
 
 /** Map a thrown value to an exit code, printing to the right stream. */
 function reportError(err: unknown, ctx: Context): number {
