@@ -112,10 +112,16 @@ Value vocabularies: `--rail` is one of `x402 mpp ap2 acp ucp card onchain`;
 
 ### audit
 
-Read the signed, hash-linked audit trail (`GET /audit`).
+Read the signed, hash-linked audit trail (`GET /audit`). With `--intent-key` it reads that
+intent's slice instead (`GET /intents/{key}/events`), which is where the server applies the
+filter: `/audit` accepts only `cursor` and `limit`.
+
+Either way the output is the server's page envelope, `{ data, has_more, next_cursor }`, so a
+partial trail is visible as one rather than reading like the whole chain.
 
 ```sh
-gl audit --intent-key k_123 --limit 50 --pretty
+gl audit --limit 50 --pretty
+gl audit --intent-key k_123 --pretty
 ```
 
 ### testnet-pay

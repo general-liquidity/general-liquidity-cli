@@ -22,10 +22,24 @@ export interface AuditEvent {
   payload: Record<string, unknown>;
 }
 
+/** The cursor-paged envelope every list route serves. Mirrors the spec `Page`. */
+export interface Page<T> {
+  data: T[];
+  has_more: boolean;
+  next_cursor: string | null;
+}
+
+// `/audit` declares exactly two query parameters, `cursor` and `limit`. It has never
+// accepted an `intent_key`, and an unknown query parameter is ignored rather than refused,
+// so asking for one intent's trail returned the WHOLE chain and looked like it had worked.
+// The per-intent slice is a different route with the key in the PATH, where the filter is
+// applied server-side, so the caller gets the answer it asked for instead of a superset.
 function auditUrl(rt: Runtime, query: AuditQuery): string {
   const base = requireBaseUrl(rt);
-  const url = new URL("audit", base.endsWith("/") ? base : `${base}/`);
-  if (query.intentKey) url.searchParams.set("intent_key", query.intentKey);
+  const root = base.endsWith("/") ? base : `${base}/`;
+  const url = query.intentKey
+    ? new URL(`intents/${encodeURIComponent(query.intentKey)}/events`, root)
+    : new URL("audit", root);
   if (query.limit != null) url.searchParams.set("limit", String(query.limit));
   return url.toString();
 }
@@ -34,7 +48,7 @@ export async function fetchAudit(
   ctx: Context,
   rt: Runtime,
   query: AuditQuery,
-): Promise<AuditEvent[]> {
+): Promise<Page<AuditEvent>> {
   const headers = new Headers({ accept: "application/json" });
   if (rt.apiKey) {
     if (rt.authScheme === "x-api-key") headers.set("x-api-key", rt.apiKey);
@@ -46,5 +60,7 @@ export async function fetchAudit(
     const problem = body && typeof body === "object" ? body : { status: res.status };
     throw Object.assign(new Error(`audit request failed (HTTP ${res.status})`), { problem });
   }
-  return body as AuditEvent[];
+  // `/audit` and `/intents/{id}/events` both serve a `Page` envelope, never a bare array.
+  // This was typed as `AuditEvent[]`, so anything indexing the result read `undefined`.
+  return body as Page<AuditEvent>;
 }
