@@ -3,13 +3,13 @@ import { run } from "../index.ts";
 import { makeHarness } from "../internal/testkit.ts";
 
 describe("gl audit", () => {
-  test("GETs /audit with query params and prints camelCase events", async () => {
+  test("GETs /audit with query params and prints the events", async () => {
     const h = makeHarness({
       env: { GL_BASE_URL: "https://gl.test", GL_API_KEY: "secret" },
       router: () => ({
         status: 200,
         json: [
-          { type: "intent.settled", at: "2026-07-22T00:00:00Z", intent_key: "k1", payload: {} },
+          { type: "intent.settled", at: "2026-07-22T00:00:00Z", intentKey: "k1", payload: {} },
         ],
       }),
     });

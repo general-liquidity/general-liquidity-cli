@@ -7,7 +7,7 @@ const PAY_TO = "0x1111111111111111111111111111111111111111";
 const RECEIPT = {
   status: 200,
   json: {
-    intent_key: "testnet-x",
+    intentKey: "testnet-x",
     rail: "x402",
     reference: "0xdeadbeef",
     terms: {
@@ -15,10 +15,10 @@ const RECEIPT = {
       finality: "instant",
       credential: "eip3009",
       rail: "x402",
-      capital_source: "payer",
+      capitalSource: "payer",
       presence: "delegated",
     },
-    settled_at: "2026-07-22T00:00:00Z",
+    settledAt: "2026-07-22T00:00:00Z",
     enforcement: "hash",
   },
 };

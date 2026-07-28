@@ -8,13 +8,13 @@ const DISCLOSURE = JSON.stringify({
 });
 
 describe("gl verify", () => {
-  test("posts the disclosure and prints the camelCase Decision", async () => {
+  test("posts the disclosure unrenamed and prints the Decision", async () => {
     const h = makeHarness({
       env: { GL_BASE_URL: "https://gl.test" },
       files: { "/tmp/d.json": DISCLOSURE },
       router: () => ({
         status: 200,
-        json: { outcome: "allow", reasons: ["ok"], mandate_id: "m1" },
+        json: { outcome: "allow", reasons: ["ok"], mandateId: "m1" },
       }),
     });
 
@@ -23,7 +23,8 @@ describe("gl verify", () => {
 
     const req = h.requests[0];
     expect(req?.url).toBe("https://gl.test/verify");
-    expect(req?.body).toMatchObject({ signature: { public_key: "pubkeyhex" } });
+    // The disclosure crosses the wire unrenamed, which is what makes its signature verifiable.
+    expect(req?.body).toMatchObject({ signature: { publicKey: "pubkeyhex" } });
 
     const parsed = JSON.parse(h.out[0] as string);
     expect(parsed).toEqual({ outcome: "allow", reasons: ["ok"], mandateId: "m1" });

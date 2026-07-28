@@ -29,13 +29,13 @@ const FULL_FLAGS = [
 ];
 
 describe("gl pay", () => {
-  test("signs the envelope and submits a snake_case Intent", async () => {
+  test("signs the envelope and submits a camelCase Intent", async () => {
     const h = makeHarness({
       env: { GL_BASE_URL: "https://gl.test", GL_SIGNER_PRIVATE_KEY: TEST_SEED },
       router: () => ({
         status: 200,
         json: {
-          intent_key: "k1",
+          intentKey: "k1",
           rail: "x402",
           reference: "0xabc",
           terms: {
@@ -43,10 +43,10 @@ describe("gl pay", () => {
             finality: "instant",
             credential: "eip3009",
             rail: "x402",
-            capital_source: "payer",
+            capitalSource: "payer",
             presence: "delegated",
           },
-          settled_at: "2026-07-22T00:00:00Z",
+          settledAt: "2026-07-22T00:00:00Z",
           enforcement: "hash",
         },
       }),
@@ -61,11 +61,11 @@ describe("gl pay", () => {
 
     const body = req?.body as {
       payee: string;
-      terms: { capital_source: string };
+      terms: { capitalSource: string };
       envelope: { signature: string; grant: { signature: string } };
     };
     expect(body.payee).toBe("0xF00");
-    expect(body.terms.capital_source).toBe("payer");
+    expect(body.terms.capitalSource).toBe("payer");
     expect(body.envelope.signature.length).toBeGreaterThan(0);
     expect(body.envelope.grant.signature.length).toBeGreaterThan(0);
 

@@ -1,19 +1,19 @@
-import { fromWire } from "@general-liquidity/sdk";
 import type { Runtime } from "./config.ts";
 import { requireBaseUrl } from "./config.ts";
 import type { Context } from "./context.ts";
 
 // The audit trail is a REST GET (/audit), not part of the SDK client surface
 // (resolve / pay / verify / disclose), so it is read directly through the injected fetch
-// with the same auth the client uses. Response keys are snake_case on the wire and
-// projected to camelCase via the SDK's fromWire.
+// with the same auth the client uses. An AuditEvent and a problem body are both camelCase
+// as served, so nothing is renamed here: this used to run the response through the SDK's
+// casing projection, which is gone because the wire never was snake_case.
 
 export interface AuditQuery {
   intentKey?: string;
   limit?: number;
 }
 
-/** One signed, hash-linked entry, camelCase-projected. Shape mirrors the spec AuditEvent. */
+/** One signed, hash-linked entry. Shape mirrors the spec AuditEvent. */
 export interface AuditEvent {
   type: string;
   at: string;
@@ -43,8 +43,8 @@ export async function fetchAudit(
   const res = await ctx.fetchImpl(auditUrl(rt, query), { method: "GET", headers });
   const body = (await res.json()) as unknown;
   if (!res.ok) {
-    const problem = body && typeof body === "object" ? fromWire(body) : { status: res.status };
+    const problem = body && typeof body === "object" ? body : { status: res.status };
     throw Object.assign(new Error(`audit request failed (HTTP ${res.status})`), { problem });
   }
-  return fromWire(body) as AuditEvent[];
+  return body as AuditEvent[];
 }
