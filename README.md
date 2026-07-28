@@ -119,8 +119,14 @@ filter: `/audit` accepts only `cursor` and `limit`.
 Either way the output is the server's page envelope, `{ data, has_more, next_cursor }`, so a
 partial trail is visible as one rather than reading like the whole chain.
 
+`--limit` is 1..100, the server's own bound. The server clamps a larger value silently, which
+on an audit log would look like the end of the evidence rather than a short page, so the CLI
+refuses it and points at `--cursor` instead. Pass a prior page's `next_cursor` to `--cursor`
+to read on; `has_more: false` is the end.
+
 ```sh
 gl audit --limit 50 --pretty
+gl audit --limit 50 --cursor 4f2c... --pretty
 gl audit --intent-key k_123 --pretty
 ```
 

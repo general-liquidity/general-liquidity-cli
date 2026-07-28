@@ -39,7 +39,7 @@ Commands:
   verify <disclosure.json>      Check a counterparty disclosure against policy (Decision)
   disclose                      Print this operator's own signed disclosure
   pay                           Submit a governed pay intent, print the Receipt or problem
-  audit [--intent-key <k>]      Read the signed audit trail, one page ([--limit <n>])
+  audit [--intent-key <k>]      Read the signed audit trail, one page ([--limit <n>] [--cursor <c>])
   testnet-pay                   Governed live Base Sepolia settlement (env-driven)
   config <show|path|get|set>    Inspect or edit the non-secret CLI config
 

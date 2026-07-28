@@ -11,6 +11,8 @@ import type { Context } from "./context.ts";
 export interface AuditQuery {
   intentKey?: string;
   limit?: number;
+  /** Opaque token from a prior page's `next_cursor`. Absent means "from the start". */
+  cursor?: string;
 }
 
 /** One signed, hash-linked entry. Shape mirrors the spec AuditEvent. */
@@ -41,6 +43,8 @@ function auditUrl(rt: Runtime, query: AuditQuery): string {
     ? new URL(`intents/${encodeURIComponent(query.intentKey)}/events`, root)
     : new URL("audit", root);
   if (query.limit != null) url.searchParams.set("limit", String(query.limit));
+  // Both routes declare `cursor`; without it the CLI could only ever read the first page.
+  if (query.cursor != null) url.searchParams.set("cursor", query.cursor);
   return url.toString();
 }
 
