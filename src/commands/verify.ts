@@ -33,5 +33,14 @@ export async function verifyCmd(argv: string[], ctx: Context): Promise<number> {
   const client = buildClient(ctx, rt, absentSigner);
   const decision = await client.verify(disclosure);
   printJson(ctx, decision, Boolean(values.pretty));
+
+  // stdout stays the Decision and nothing else, so a pipe still parses. A refusal that names
+  // the predicates it failed on is what an operator acts on; `reasons` is prose written for a
+  // human to read, and the check ids are the stable thing to grep, script, and file a ticket
+  // against. Absent checks are not "all passed", so nothing is printed when the gate sent none.
+  if (decision.outcome !== "allow") {
+    const failed = decision.checks?.filter((c) => !c.passed).map((c) => c.id) ?? [];
+    if (failed.length > 0) ctx.err(`${decision.outcome}: failed checks: ${failed.join(", ")}`);
+  }
   return 0;
 }
