@@ -105,10 +105,17 @@ gl pay \
 Optional: `--expires <iso>` (grant expiry, default 24h), `--idempotency-key <k>` (the SDK
 generates one when omitted).
 
-Value vocabularies: `--rail` is one of `x402 mpp ap2 acp ucp card onchain`;
+Value vocabularies: `--rail` is one of `x402 mpp ap2 acp ucp card onchain l402 ach wire`;
 `--reversibility` is `reversible | irreversible`; `--finality` is `instant | deferred`;
 `--capital-source` is `payer | facilitator | merchant_of_record | solver`; `--presence` is
 `present | delegated`.
+
+The two bank rails differ in the way that matters to a spend agent. `ach` is reversible with
+deferred finality and a return window measured in days, so the money can still be taken back
+by the receiving bank after the Receipt exists. `wire` is irreversible with instant finality
+and no return window, and a wire submitted after the bank's daily cutoff is refused rather
+than queued, because there is no honest Receipt claiming instant finality for a message that
+has not left the bank.
 
 ### audit
 

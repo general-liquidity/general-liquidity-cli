@@ -4,7 +4,18 @@ import type { Intent } from "@general-liquidity/sdk";
 // wire contract (types.ts) and the OpenAPI spec. These are structural enums, not a
 // mutable data list, so they are encoded here for validation and help output.
 
-export const RAILS = ["x402", "mpp", "ap2", "acp", "ucp", "card", "onchain"] as const;
+export const RAILS = [
+  "x402",
+  "mpp",
+  "ap2",
+  "acp",
+  "ucp",
+  "card",
+  "onchain",
+  "l402",
+  "ach",
+  "wire",
+] as const;
 export const REVERSIBILITY = ["reversible", "irreversible"] as const;
 export const FINALITY = ["instant", "deferred"] as const;
 export const CAPITAL_SOURCE = ["payer", "facilitator", "merchant_of_record", "solver"] as const;

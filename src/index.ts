@@ -39,6 +39,10 @@ Commands:
   verify <disclosure.json>      Check a counterparty disclosure against policy (Decision)
   disclose                      Print this operator's own signed disclosure
   pay                           Submit a governed pay intent, print the Receipt or problem
+                                --rail is one of: x402 mpp ap2 acp ucp card onchain l402 ach wire
+                                  ach   reversible, deferred finality, return window in days
+                                  wire  irreversible, instant finality, no return window,
+                                        refused rather than queued after the daily cutoff
   audit [--intent-key <k>]      Read the signed audit trail, one page ([--limit <n>] [--cursor <c>])
   testnet-pay                   Governed live Base Sepolia settlement (env-driven)
   config <show|path|get|set>    Inspect or edit the non-secret CLI config
