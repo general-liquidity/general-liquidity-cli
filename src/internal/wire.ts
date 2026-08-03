@@ -1,4 +1,4 @@
-import type { Intent } from "@general-liquidity/sdk";
+import type { Intent, QuoteRequest } from "@general-liquidity/sdk";
 
 // The closed value vocabularies for the six irreducible Terms. Each literal below is
 // checked against the SDK wire contract in BOTH directions at compile time: `satisfies`
@@ -53,3 +53,14 @@ export type UncoveredCapitalSource = AssertNever<Uncovered<CapitalSource, typeof
 
 export const PRESENCE = ["present", "delegated"] as const satisfies readonly Presence[];
 export type UncoveredPresence = AssertNever<Uncovered<Presence, typeof PRESENCE>>;
+
+/**
+ * The checkout protocols, a CLOSED SUBSET of `RAILS`. `quote` and `buy` dispatch only to
+ * these, and a RailId that is not a checkout protocol is refused here rather than sent to a
+ * merchant that cannot speak it. Checked in both directions like the rest, so a checkout
+ * protocol added to the SDK and not added here is a type error in this file.
+ */
+export type CheckoutRail = QuoteRequest["rail"];
+
+export const CHECKOUT_RAILS = ["acp", "ucp"] as const satisfies readonly CheckoutRail[];
+export type UncoveredCheckoutRails = AssertNever<Uncovered<CheckoutRail, typeof CHECKOUT_RAILS>>;

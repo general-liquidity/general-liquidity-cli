@@ -1,4 +1,9 @@
-import { createClient, type GeneralLiquidity, type Signer } from "@general-liquidity/sdk";
+import {
+  type Commerce,
+  createClient,
+  type GeneralLiquidity,
+  type Signer,
+} from "@general-liquidity/sdk";
 import type { Runtime } from "./config.ts";
 import { requireBaseUrl } from "./config.ts";
 import type { Context, FetchLike } from "./context.ts";
@@ -15,7 +20,11 @@ export function authedFetch(base: FetchLike, rt: Runtime): FetchLike {
 }
 
 /** Build the SDK client bound to the configured server, auth, and operator signer. */
-export function buildClient(ctx: Context, rt: Runtime, signer: Signer): GeneralLiquidity {
+export function buildClient(
+  ctx: Context,
+  rt: Runtime,
+  signer: Signer,
+): GeneralLiquidity & Commerce {
   return createClient({
     baseUrl: requireBaseUrl(rt),
     signer,

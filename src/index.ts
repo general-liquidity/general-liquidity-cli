@@ -1,6 +1,7 @@
 #!/usr/bin/env bun
 import { approveCmd } from "./commands/approve.ts";
 import { auditCmd } from "./commands/audit.ts";
+import { quoteCmd } from "./commands/commerce.ts";
 import { configCmd } from "./commands/config.ts";
 import { discloseCmd } from "./commands/disclose.ts";
 import { killSwitchCmd } from "./commands/killSwitch.ts";
@@ -21,6 +22,7 @@ const COMMANDS: Record<string, Handler> = {
   verify: verifyCmd,
   disclose: discloseCmd,
   pay: payCmd,
+  quote: quoteCmd,
   audit: auditCmd,
   "testnet-pay": testnetPayCmd,
   config: configCmd,
@@ -43,6 +45,11 @@ Commands:
                                   ach   reversible, deferred finality, return window in days
                                   wire  irreversible, instant finality, no return window,
                                         refused rather than queued after the daily cutoff
+  quote                         Price a cart against a merchant; commits nothing (Cart)
+                                --rail is a checkout protocol: acp or ucp
+                                --merchant <ref> --currency <code> --line <itemId>:<qty> (repeatable)
+                                Only a Cart in status "ready" can be bought. Commerce is an
+                                opt-in tier; a stack without it answers not_found
   audit [--intent-key <k>]      Read the signed audit trail, one page ([--limit <n>] [--cursor <c>])
   testnet-pay                   Governed live Base Sepolia settlement (env-driven)
   config <show|path|get|set>    Inspect or edit the non-secret CLI config
