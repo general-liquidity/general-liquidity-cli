@@ -199,12 +199,22 @@ gl testnet-pay --pretty
 
 ## Documented gaps
 
-### No `grant` command
+### No mandate command
 
-The canonical GL surface lists `grant` (operator issues or revokes a scoped `Mandate`) as
-governance, but neither the SDK client nor the OpenAPI spec exposes a grant operation.
-Mandate issuance is therefore out of scope for this CLI until the server surfaces it. The
-CLI does not ship a fake `grant`.
+You cannot issue or revoke a `Mandate` from this CLI, but not because the capability is
+missing. Mandate issuance exists: `mandate/create` grants bounded, revocable spending
+authority, with a per-authorization ceiling, a cumulative ceiling over a rolling period, an
+expiry that lapses whatever is left, and a closed set of payees.
+
+It lives on the **protocol tier**, served from the platform's meta-model and published live
+at `GET /openapi.json`, alongside `mandate/get` and the rest of the governed kernel. This
+CLI is built against the **product tier** (`spec/openapi.yaml`), which does not carry those
+methods, so the SDK it delegates to cannot reach them either.
+
+That matters more than it sounds: a mandate is where the blast radius of everything an agent
+later does is fixed, and this CLI can spend under one but not create one. Until the product
+tier carries mandate issuance, reach it through the protocol tier directly. The CLI does not
+ship a fake `grant`.
 
 ### No `buy` command
 
