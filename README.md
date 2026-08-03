@@ -110,12 +110,18 @@ Value vocabularies: `--rail` is one of `x402 mpp ap2 acp ucp card onchain l402 a
 `--capital-source` is `payer | facilitator | merchant_of_record | solver`; `--presence` is
 `present | delegated`.
 
-The two bank rails differ in the way that matters to a spend agent. `ach` is reversible with
-deferred finality and a return window measured in days, so the money can still be taken back
-by the receiving bank after the Receipt exists. `wire` is irreversible with instant finality
-and no return window, and a wire submitted after the bank's daily cutoff is refused rather
-than queued, because there is no honest Receipt claiming instant finality for a message that
-has not left the bank.
+**Not every rail in that list settles yet.** `x402`, `mpp`, `ap2`, `acp`, `ucp`, `card` and
+`onchain` have adapters. `l402`, `ach` and `wire` are accepted by the schema but have no
+wired adapter behind them, so treat them as declared, not delivered, and do not plan a
+migration onto one on the strength of this list.
+
+The intended semantics for the two bank rails, once they land, are worth stating because
+they drive the `--reversibility` and `--finality` you would pair them with. `ach` is
+reversible with deferred finality and a return window measured in days, so money can still
+be taken back by the receiving bank after the Receipt exists. `wire` is irreversible with
+instant finality and no return window, and a wire submitted after the bank's daily cutoff
+should be refused rather than queued, because there is no honest Receipt claiming instant
+finality for a message that has not left the bank.
 
 ### quote
 
