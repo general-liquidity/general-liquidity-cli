@@ -110,13 +110,21 @@ Value vocabularies: `--rail` is one of `x402 mpp ap2 acp ucp card onchain l402 a
 `--capital-source` is `payer | facilitator | merchant_of_record | solver`; `--presence` is
 `present | delegated`.
 
-**Not every rail in that list settles yet.** `x402`, `mpp`, `ap2`, `acp`, `ucp`, `card` and
-`onchain` have adapters. `l402`, `ach` and `wire` are accepted by the schema but have no
-wired adapter behind them, so treat them as declared, not delivered, and do not plan a
-migration onto one on the strength of this list.
+**Rails are supplied by the operator, not by the server.** The gateway constructs only
+`x402` itself; every other rail is passed in through `GatewayConfig.rails`. So the list above
+is what the gate will authorize, not what any given deployment can settle — that depends on
+which rails the operator wired and what each one needs underneath it. `card` needs a
+PSP/acquirer client, `ach` and `wire` need an ODFI or processor, `l402` needs a Lightning
+payer. None of those are shipped, deliberately: this stack holds no rail credential.
 
-The intended semantics for the two bank rails, once they land, are worth stating because
-they drive the `--reversibility` and `--finality` you would pair them with. `ach` is
+Two of them also live outside the gateway's dependencies. `ach` and `wire` come from
+`@general-liquidity/bank-rails` and `l402` from `@general-liquidity/l402`, so an operator
+adds that workspace dependency and constructs the rail. Both packages are complete, with
+banking-day arithmetic, return-code classification and cutoff forecasting on the bank side.
+
+The semantics of the two bank rails are worth stating because they drive the
+`--reversibility` and `--finality` you would pair them with, and the gate reads them from
+its own table rather than trusting what a caller claims. `ach` is
 reversible with deferred finality and a return window measured in days, so money can still
 be taken back by the receiving bank after the Receipt exists. `wire` is irreversible with
 instant finality and no return window, and a wire submitted after the bank's daily cutoff
