@@ -117,6 +117,38 @@ and no return window, and a wire submitted after the bank's daily cutoff is refu
 than queued, because there is no honest Receipt claiming instant finality for a message that
 has not left the bank.
 
+### quote
+
+Price a cart against a merchant over a checkout protocol (`POST /quote`). Commits nothing
+and moves no money, so it needs no signer key and no mandate: it prints the
+server-authoritative `Cart` the merchant priced.
+
+```sh
+gl quote --rail acp \
+  --merchant shop.example \
+  --currency USD \
+  --line sku-1:2 \
+  --line sku-2:1 \
+  --pretty
+```
+
+`--rail` takes a checkout protocol only, `acp` or `ucp`. A `RailId` that is not a checkout
+protocol — `x402`, `card`, `wire` — is refused here rather than dispatched to a merchant
+that cannot speak it.
+
+`--line` is `<itemId>:<quantity>`, repeatable, at least one required. It splits on the last
+colon, so an item id may itself contain one (`--line urn:sku:1:3` is three of `urn:sku:1`).
+A zero, negative or fractional quantity is refused before the request leaves, because a cart
+the merchant rejects costs a round trip and reports the failure in the merchant's vocabulary
+instead of this one's.
+
+Only a `Cart` in status `ready` can go on to be bought. Every other status — `priced`,
+`escalation_required`, `authorized`, `completed`, `canceled` — is the refusal reporting what
+the checkout still needs.
+
+Commerce is an opt-in tier. A deployment that did not enable it answers `not_found` on this
+path exactly as if it never existed.
+
 ### audit
 
 Read the signed, hash-linked audit trail (`GET /audit`). With `--intent-key` it reads that
@@ -165,12 +197,27 @@ gl testnet-pay --pretty
 - The CLI never holds a settle primitive. It signs intents and submits them; the sovereign
   gate on the server decides and settles.
 
-## Documented gap: no `grant` command
+## Documented gaps
+
+### No `grant` command
 
 The canonical GL surface lists `grant` (operator issues or revokes a scoped `Mandate`) as
-governance, but the current SDK client (`resolve`, `pay`, `verify`, `disclose`) and the
-OpenAPI spec expose no grant operation. Mandate issuance is therefore out of scope for this
-CLI until the server surfaces it. The CLI does not ship a fake `grant`.
+governance, but neither the SDK client nor the OpenAPI spec exposes a grant operation.
+Mandate issuance is therefore out of scope for this CLI until the server surfaces it. The
+CLI does not ship a fake `grant`.
+
+### No `buy` command
+
+`gl quote` ships; `gl buy` does not. A `BuyRequest` carries a mandate-bearing envelope whose
+signature the gate verifies, but the intent the gate evaluates for a buy is constructed
+server-side from the merchant's own cart, so this CLI cannot build the signed preimage the
+way `pay` does through the SDK's `signIntent`. A `buy` that guessed at that preimage would
+emit requests the gate refuses, which is worse than not shipping it.
+
+This affects only the CLI. `POST /buy` is on the REST surface, `client.buy()` is on the SDK,
+and the MCP server exposes a `buy` tool — in all three the caller supplies an
+already-signed envelope rather than constructing one. The reason is recorded at the top of
+`src/commands/commerce.ts`.
 
 ## Development
 
