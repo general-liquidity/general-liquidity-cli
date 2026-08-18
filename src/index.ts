@@ -4,6 +4,8 @@ import { auditCmd } from "./commands/audit.ts";
 import { quoteCmd } from "./commands/commerce.ts";
 import { configCmd } from "./commands/config.ts";
 import { discloseCmd } from "./commands/disclose.ts";
+import { healthCmd } from "./commands/health.ts";
+import { intentsCmd } from "./commands/intents.ts";
 import { killSwitchCmd } from "./commands/killSwitch.ts";
 import { mandateCmd } from "./commands/mandate.ts";
 import { payCmd } from "./commands/pay.ts";
@@ -25,7 +27,9 @@ const COMMANDS: Record<string, Handler> = {
   pay: payCmd,
   quote: quoteCmd,
   mandate: mandateCmd,
+  intents: intentsCmd,
   audit: auditCmd,
+  health: healthCmd,
   "testnet-pay": testnetPayCmd,
   config: configCmd,
   approve: approveCmd,
@@ -55,7 +59,13 @@ Commands:
   mandate                       Print this credential's live spend authority and what is
                                 left of it. spent/remaining are ABSENT (not zero) when a
                                 prior spend is in a currency the server cannot convert
+  intents                       List this credential's intents, newest first
+                                [--status pending|settled|denied|failed] [--limit <n>] [--cursor <c>]
+                                --status pending finds an intent parked by a gate confirm
+                                whose id was returned once and not kept
   audit [--intent-key <k>]      Read the signed audit trail, one page ([--limit <n>] [--cursor <c>])
+  health                        Is the server up, and what version does it stamp. Needs only
+                                a base URL: no API key, no signer
   testnet-pay                   Governed live Base Sepolia settlement (env-driven)
   config <show|path|get|set>    Inspect or edit the non-secret CLI config
 

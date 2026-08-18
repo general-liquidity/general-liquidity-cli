@@ -189,6 +189,47 @@ an error, and the exit code stays 0.
 Mandate introspection is opt-in per deployment; a stack without a mandate store answers
 `not_found`.
 
+### intents
+
+List this credential's intents, newest first (`GET /intents`). A read: no signer key, nothing
+moved.
+
+```sh
+gl intents --status pending --pretty
+gl intents --limit 25 --cursor 4f2c... --pretty
+```
+
+`--status` is one of `pending settled denied failed`, and an unknown value is refused here
+rather than sent, because the server would answer 400 and that costs a round trip to learn a
+closed vocabulary. Omitting it lists every lifecycle.
+
+`--status pending` is the one worth knowing. A gate `confirm` parks an intent and returns its
+id once, inside the `approval.pending` problem. Lose that id and there was previously nothing
+to do but page the whole audit trail hunting for something you could not name. This is that
+search in one call, and each row carries the `pending.challenge` an operator approval binds to.
+
+Output is the server's page envelope, `{ data, hasMore, nextCursor }`. `--limit` is 1..100 and
+a larger value is refused rather than silently clamped, for the same reason as `gl audit`: a
+short page reads like having fewer intents than you have.
+
+Opt-in with the rest of the job resource; a deployment without job reads answers `not_found`.
+
+### health
+
+Is the configured server up, and which API version does it stamp (`GET /health`).
+
+```sh
+GL_BASE_URL=https://api.gl.test gl health --pretty
+```
+
+The one command that needs nothing but a base URL. `/health` is served before auth, so no API
+key and no signer are required, and that is what makes it useful: a failing `gl pay` cannot by
+itself tell a deployment that is down from one that refused the credential, and those have
+different fixes.
+
+It reports no capability roster and will not tell you which optional tiers a deployment
+mounted. Call the route and read the `not_found`.
+
 ### audit
 
 Read the signed, hash-linked audit trail (`GET /audit`). With `--intent-key` it reads that
