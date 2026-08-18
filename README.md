@@ -163,6 +163,32 @@ the checkout still needs.
 Commerce is an opt-in tier. A deployment that did not enable it answers `not_found` on this
 path exactly as if it never existed.
 
+### mandate
+
+Print the live spend authority covering this credential, and what is left of it
+(`GET /mandate`). A read: it moves nothing, grants nothing, and needs no signer key.
+
+```sh
+gl mandate --pretty
+```
+
+Spend authority used to be discoverable only by trying a payment and being refused. This is
+how you size a commitment before making it, and how you tell "not allowed" apart from "not
+allowed yet, resets at `periodResetAt`".
+
+`remaining` is the gate's own measurement, so spending exactly it is not refused for the
+period cap. **`spent` and `remaining` are absent together** when the server holds a prior
+spend in a currency it has no rate for — the same state in which the gate refuses to
+authorize at all. Absent means unknown; do not read it as zero.
+
+`irreversibleSpent` appears only on a mandate declaring an `irreversibleOutlay` bound.
+
+An empty `data` array means this credential holds no live authority. That is an answer, not
+an error, and the exit code stays 0.
+
+Mandate introspection is opt-in per deployment; a stack without a mandate store answers
+`not_found`.
+
 ### audit
 
 Read the signed, hash-linked audit trail (`GET /audit`). With `--intent-key` it reads that

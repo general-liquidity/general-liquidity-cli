@@ -5,6 +5,7 @@ import { quoteCmd } from "./commands/commerce.ts";
 import { configCmd } from "./commands/config.ts";
 import { discloseCmd } from "./commands/disclose.ts";
 import { killSwitchCmd } from "./commands/killSwitch.ts";
+import { mandateCmd } from "./commands/mandate.ts";
 import { payCmd } from "./commands/pay.ts";
 import { refundCmd } from "./commands/refund.ts";
 import { resetBreakerCmd } from "./commands/resetBreaker.ts";
@@ -23,6 +24,7 @@ const COMMANDS: Record<string, Handler> = {
   disclose: discloseCmd,
   pay: payCmd,
   quote: quoteCmd,
+  mandate: mandateCmd,
   audit: auditCmd,
   "testnet-pay": testnetPayCmd,
   config: configCmd,
@@ -50,6 +52,9 @@ Commands:
                                 --merchant <ref> --currency <code> --line <itemId>:<qty> (repeatable)
                                 Only a Cart in status "ready" can be bought. Commerce is an
                                 opt-in tier; a stack without it answers not_found
+  mandate                       Print this credential's live spend authority and what is
+                                left of it. spent/remaining are ABSENT (not zero) when a
+                                prior spend is in a currency the server cannot convert
   audit [--intent-key <k>]      Read the signed audit trail, one page ([--limit <n>] [--cursor <c>])
   testnet-pay                   Governed live Base Sepolia settlement (env-driven)
   config <show|path|get|set>    Inspect or edit the non-secret CLI config
