@@ -11,7 +11,7 @@ import type { Context } from "./context.ts";
 export interface AuditQuery {
   intentKey?: string;
   limit?: number;
-  /** Opaque token from a prior page's `next_cursor`. Absent means "from the start". */
+  /** Opaque token from a prior page's `nextCursor`. Absent means "from the start". */
   cursor?: string;
 }
 
@@ -27,8 +27,8 @@ export interface AuditEvent {
 /** The cursor-paged envelope every list route serves. Mirrors the spec `Page`. */
 export interface Page<T> {
   data: T[];
-  has_more: boolean;
-  next_cursor: string | null;
+  hasMore: boolean;
+  nextCursor: string | null;
 }
 
 // `/audit` declares exactly two query parameters, `cursor` and `limit`. It has never

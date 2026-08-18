@@ -7,8 +7,8 @@ describe("gl audit", () => {
     status: 200,
     json: {
       data: [{ type: "intent.settled", at: "2026-07-22T00:00:00Z", intentKey, payload: {} }],
-      has_more: false,
-      next_cursor: null,
+      hasMore: false,
+      nextCursor: null,
     },
   });
 
@@ -31,8 +31,8 @@ describe("gl audit", () => {
     const body = JSON.parse(h.out[0] as string);
     expect(Array.isArray(body)).toBe(false);
     expect(body.data[0].intentKey).toBe("k1");
-    expect(body.has_more).toBe(false);
-    expect(body.next_cursor).toBeNull();
+    expect(body.hasMore).toBe(false);
+    expect(body.nextCursor).toBeNull();
   });
 
   // The regression this pins: `--intent-key` used to send an `intent_key` QUERY param, which
@@ -84,7 +84,7 @@ describe("gl audit", () => {
 
   // Without --cursor there was no way to read past the first page at all, even though the
   // envelope has always carried the token needed to continue.
-  test("--cursor forwards a prior page's next_cursor", async () => {
+  test("--cursor forwards a prior page's nextCursor", async () => {
     const h = makeHarness({
       env: { GL_BASE_URL: "https://gl.test" },
       router: () => page("k2"),

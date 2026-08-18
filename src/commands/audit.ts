@@ -13,10 +13,10 @@ const MAX_LIMIT = 100;
 
 /** gl audit [--intent-key <k>] [--limit <n>] [--cursor <c>] - read the signed audit trail.
  *
- *  Prints the server's `Page` envelope verbatim (`data`, `has_more`, `next_cursor`) rather
+ *  Prints the server's `Page` envelope verbatim (`data`, `hasMore`, `nextCursor`) rather
  *  than unwrapping `data`: a caller that reads the output cannot otherwise tell a complete
  *  trail from the first page of one, which on an audit log is the difference between
- *  evidence and a sample. `--cursor` takes a prior page's `next_cursor`, which is what makes
+ *  evidence and a sample. `--cursor` takes a prior page's `nextCursor`, which is what makes
  *  the rest of the chain reachable at all. */
 export async function auditCmd(argv: string[], ctx: Context): Promise<number> {
   const { values } = parseArgs({
@@ -37,14 +37,14 @@ export async function auditCmd(argv: string[], ctx: Context): Promise<number> {
       throw new CliError(
         `--limit must be an integer between 1 and ${MAX_LIMIT} (the server clamps to that ` +
           `range without saying so, so a larger page size would return fewer rows than asked ` +
-          `for). Page the rest with --cursor <next_cursor>.`,
+          `for). Page the rest with --cursor <nextCursor>.`,
       );
     }
   }
 
   const cursor = typeof values.cursor === "string" ? values.cursor : undefined;
   if (cursor !== undefined && cursor.length === 0) {
-    throw new CliError("--cursor must be a next_cursor value from a prior page");
+    throw new CliError("--cursor must be a nextCursor value from a prior page");
   }
 
   const rt = resolveRuntime(ctx);
