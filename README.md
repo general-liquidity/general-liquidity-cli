@@ -131,6 +131,28 @@ instant finality and no return window, and a wire submitted after the bank's dai
 should be refused rather than queued, because there is no honest Receipt claiming instant
 finality for a message that has not left the bank.
 
+### simulate
+
+What the gate would decide for a pay intent, without doing any of it. Takes exactly the flags
+`gl pay` takes and builds the same signed envelope, because a dry run over a differently
+constructed intent answers a question nobody asked.
+
+```sh
+gl simulate --payee 0xF00... --amount 1000 --asset USDC --purpose "api credits"   --rail x402 --reversibility irreversible --finality instant --credential eip3009   --capital-source payer --presence delegated --mandate m_ops_daily --pretty
+```
+
+`gl mandate` shows the caps and nothing else, so a deny-list hit, a risk tier or a velocity
+refusal is invisible there until you are refused by one. This asks the whole gate. It settles
+nothing, writes no audit entry, and does not consume the idempotency key, so simulating a
+payment never prevents making it.
+
+A refused verdict still exits 0. The answer is the deliverable, and exiting non-zero would have
+scripts read "the gate would refuse this" as "the tool broke".
+
+`authorizes` is always false. Everything else in the output is shaped like a real verdict, so
+reading `outcome: allow` as permission is the one way to misuse this. Nothing was reserved, and
+the state behind the answer can move before you submit.
+
 ### quote
 
 Price a cart against a merchant over a checkout protocol (`POST /quote`). Commits nothing

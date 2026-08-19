@@ -12,6 +12,7 @@ import { payCmd } from "./commands/pay.ts";
 import { refundCmd } from "./commands/refund.ts";
 import { resetBreakerCmd } from "./commands/resetBreaker.ts";
 import { resolveCmd } from "./commands/resolve.ts";
+import { simulateCmd } from "./commands/simulate.ts";
 import { testnetPayCmd } from "./commands/testnetPay.ts";
 import { verifyCmd } from "./commands/verify.ts";
 import { type Context, defaultContext } from "./internal/context.ts";
@@ -25,6 +26,7 @@ const COMMANDS: Record<string, Handler> = {
   verify: verifyCmd,
   disclose: discloseCmd,
   pay: payCmd,
+  simulate: simulateCmd,
   quote: quoteCmd,
   mandate: mandateCmd,
   intents: intentsCmd,
@@ -51,6 +53,10 @@ Commands:
                                   ach   reversible, deferred finality, return window in days
                                   wire  irreversible, instant finality, no return window,
                                         refused rather than queued after the daily cutoff
+  simulate                      What the gate WOULD decide for a pay intent. Same flags as
+                                pay. Settles nothing, writes no audit entry, and does not
+                                consume the idempotency key. authorizes is always false: an
+                                allow is an answer, never permission
   quote                         Price a cart against a merchant; commits nothing (Cart)
                                 --rail is a checkout protocol: acp or ucp
                                 --merchant <ref> --currency <code> --line <itemId>:<qty> (repeatable)

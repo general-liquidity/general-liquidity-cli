@@ -36,7 +36,16 @@ function oneOf<T extends readonly string[]>(
  * decides and, on allow, settles and returns a Receipt. On deny the server's RFC 7807
  * problem is printed. The six Terms are required flags, never silently defaulted.
  */
-export async function payCmd(argv: string[], ctx: Context): Promise<number> {
+/** What both the settling and the dry-run command need: one signed Intent and a client to
+ *  send it with. Shared rather than copied because the two must construct the SAME envelope:
+ *  a dry run over a differently-built intent would answer a question nobody asked. */
+export interface PreparedIntent {
+  intent: Intent;
+  client: ReturnType<typeof buildClient>;
+  pretty: boolean;
+}
+
+export async function prepareIntent(argv: string[], ctx: Context): Promise<PreparedIntent> {
   const { values } = parseArgs({
     args: argv,
     options: {
@@ -102,8 +111,11 @@ export async function payCmd(argv: string[], ctx: Context): Promise<number> {
     },
   };
 
-  const client = buildClient(ctx, rt, signer);
-  const receipt = await client.pay(intent);
-  printJson(ctx, receipt, Boolean(values.pretty));
+  return { intent, client: buildClient(ctx, rt, signer), pretty: Boolean(values.pretty) };
+}
+
+export async function payCmd(argv: string[], ctx: Context): Promise<number> {
+  const { intent, client, pretty } = await prepareIntent(argv, ctx);
+  printJson(ctx, await client.pay(intent), pretty);
   return 0;
 }
